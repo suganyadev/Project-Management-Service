@@ -1,0 +1,24 @@
+package com.project.management.validator;
+
+import org.springframework.stereotype.Component;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+
+import com.project.management.model.ProjectManagementVO;
+import com.project.management.vo.UserVO;
+
+
+@Component
+public class ProjectValidator implements Validator{
+
+	@Override
+	public boolean supports(Class<?> clazz) {
+		return UserVO.class.isAssignableFrom(clazz);
+	}
+
+	@Override
+	public void validate(Object target, Errors errors) {
+		
+	}
+
+}
