@@ -1,6 +1,7 @@
 package com.project.management.model;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,18 +33,24 @@ public class Users {
 	private String lastName;
 	
 	@Column(name="employee_id")
-	private int employeeId;
+	private String employeeId;
 	
 	@Column(name="status")
 	private String status;
 	
+	@Column(name="project_id")
+	int projectId;
+	
 	@OneToMany
 	@JoinColumn(name="project_id")
-	List<Project> project;
+	Set<Project> project;
+	
+	@Column(name="task_id")
+	int taskId;
 	
 	@OneToMany
 	@JoinColumn(name="task_id")
-	List<Task> task;
+	Set<Task> task;
 
 	public int getUserId() {
 		return userId;
@@ -69,27 +76,46 @@ public class Users {
 		this.lastName = lastName;
 	}
 
-	public int getEmployeeId() {
+	 
+	public String getEmployeeId() {
 		return employeeId;
 	}
 
-	public void setEmployeeId(int employeeId) {
+	public void setEmployeeId(String employeeId) {
 		this.employeeId = employeeId;
 	}
 
-	public List<Project> getProject() {
+	 
+
+	public int getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(int projectId) {
+		this.projectId = projectId;
+	}
+
+	public Set<Project> getProject() {
 		return project;
 	}
 
-	public void setProject(List<Project> project) {
+	public void setProject(Set<Project> project) {
 		this.project = project;
 	}
 
-	public List<Task> getTask() {
+	public int getTaskId() {
+		return taskId;
+	}
+
+	public void setTaskId(int taskId) {
+		this.taskId = taskId;
+	}
+
+	public Set<Task> getTask() {
 		return task;
 	}
 
-	public void setTask(List<Task> task) {
+	public void setTask(Set<Task> task) {
 		this.task = task;
 	}
 

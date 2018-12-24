@@ -1,12 +1,15 @@
 package com.project.management.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
 import com.project.management.model.Project;
@@ -64,6 +67,8 @@ public class ProjectManagementServiceImpl implements ProjectManagementService{
 			user.setEmployeeId(existingUser.getEmployeeId());
 			user.setFirstName(existingUser.getFirstName());
 			user.setLastName(existingUser.getLastName());
+			user.setProjectId(0);
+			user.setTaskId(0);
 			user.setStatus("InActive");
 			userRepository.save(user);
 		}else {
@@ -86,6 +91,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService{
 			userVO.setLastName(user.getLastName());
 			userVO.setEmployeeId(user.getEmployeeId());
 			userVO.setStatus(user.getStatus());
+			userVO.setUserId(user.getUserId());
 			userVOList.add(userVO);
 			
 		}
@@ -110,7 +116,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService{
 
 		Project project=new Project();
 		project.setProjectId(projectVO.getProjectId());
-		project.setProject(projectVO.getProjectName());
+		project.setProject(projectVO.getProject());
 		//project.setStartDate(projectVO.getStartDate());
 		//project.setEndDate(projectVO.getEndDate());
 		project.setPriority(projectVO.getPriority());
@@ -132,7 +138,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService{
 			project.setProjectId(project.getProjectId());
 			project.setStartDate(project.getStartDate());
 			project.setEndDate(project.getEndDate());
-			//project.setStatus(project.getStatus());
+			project.setStatus(project.getStatus());
 			projectVOList.add(userVO);
 			
 		}
@@ -142,14 +148,27 @@ public class ProjectManagementServiceImpl implements ProjectManagementService{
 	@Override
 	public void createProject(ProjectVO vo) {
 		Project project = new Project();
-		
-		project.setProject(vo.getProjectName());
+		project.setProject(vo.getProject());
 		project.setStartDate(vo.getStartDate());
 		project.setEndDate(vo.getEndDate());
 		project.setPriority(vo.getPriority());
 		project.setStatus(vo.getStatus());
-		projectRepository.save(project);
+		project = projectRepository.save(project);
+		System.out.println(" addedProject.getProjectId() "+project.getProjectId());
+		
+		Users user = userRepository.findById(vo.getUserId()).get();
+		Users newUser = new Users();
+		newUser.setProjectId(project.getProjectId());
+		newUser.setEmployeeId(vo.getEmployeeId());
+		newUser.setFirstName(user.getFirstName());
+		newUser.setLastName(user.getLastName());
+		newUser.setStatus("Open");
 	
+		Set<Project> projectSet = new HashSet<Project>();
+		projectSet.add(project);
+		//newUser.setProject(projectSet);
+		
+		userRepository.save(newUser);
 	}
 	
 }

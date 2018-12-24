@@ -29,11 +29,11 @@ public class Project {
 	private Date endDate;
 	
 	@Column(name="priority")
-	private int priority;
+	private String priority;
 
 	@Column(name="status")
 	private String status;
-	
+
 	public int getProjectId() {
 		return projectId;
 	}
@@ -66,11 +66,11 @@ public class Project {
 		this.endDate = endDate;
 	}
 
-	public int getPriority() {
+	public String getPriority() {
 		return priority;
 	}
 
-	public void setPriority(int priority) {
+	public void setPriority(String priority) {
 		this.priority = priority;
 	}
 

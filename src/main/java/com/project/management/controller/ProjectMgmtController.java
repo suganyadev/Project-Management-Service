@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.project.management.model.ProjectManagementVO;
 import com.project.management.service.ProjectManagementService;
 import com.project.management.validator.ProjectValidator;
+import com.project.management.validator.UserValidator;
 import com.project.management.vo.ProjectVO;
 import com.project.management.vo.UserVO;
 
@@ -37,15 +38,24 @@ public class ProjectMgmtController {
 
 
 	@Autowired
-	ProjectValidator validator; 
+	ProjectValidator projectValidator; 
+	
+	@Autowired
+	UserValidator userValidator; 
 
 	@Autowired
 	ProjectManagementService service;
 
-	@InitBinder
-	public void InitBinder(WebDataBinder binder) {
-		binder.setValidator(validator);
+	@InitBinder("projectValidator")
+	public void InitProjectBinder(WebDataBinder binder) {
+		binder.setValidator(projectValidator);
 	}
+	
+	@InitBinder("userValidator")
+	public void InitUserBinder(WebDataBinder binder) {
+		binder.setValidator(userValidator);
+	}
+
 
 	@GetMapping("/")
 	public String info() {
@@ -140,7 +150,7 @@ public class ProjectMgmtController {
 			if(errors.size()>0)
 				return new ResponseEntity<>(errors, HttpStatus.OK);
 
-			vo.setStatus("Active");
+		//	vo.setStatus("Open");
 			service.createProject(vo);
 			
 		}catch(Exception e) {

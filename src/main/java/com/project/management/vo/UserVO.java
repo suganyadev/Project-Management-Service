@@ -1,16 +1,24 @@
 package com.project.management.vo;
 
 public class UserVO {
-	private int employeeId;
+	private int userId;
+	private String employeeId;
 	private String firstName;
 	private String lastName;
 	private String status;
 	private ProjectVO project;
 	private TaskVO task;
-	public int getEmployeeId() {
+	 
+	public int getUserId() {
+		return userId;
+	}
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+	public String getEmployeeId() {
 		return employeeId;
 	}
-	public void setEmployeeId(int employeeId) {
+	public void setEmployeeId(String employeeId) {
 		this.employeeId = employeeId;
 	}
 	public String getFirstName() {

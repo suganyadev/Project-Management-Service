@@ -15,24 +15,32 @@ public class ProjectVO {
 	 * 
 	 */
 	private int projectId;
-	private String projectName;
+	private String project;
 	private Date startDate;
 	private Date endDate;
-	private int priority;
+	private String priority;
 	private String status;
 	private String employeeId;
 	private int noOfTask;
+	private int userId;
+	
+	public int getUserId() {
+		return userId;
+	}
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
 	public int getProjectId() {
 		return projectId;
 	}
 	public void setProjectId(int projectId) {
 		this.projectId = projectId;
 	}
-	public String getProjectName() {
-		return projectName;
+	public String getProject() {
+		return project;
 	}
-	public void setProjectName(String projectName) {
-		this.projectName = projectName;
+	public void setProject(String project) {
+		this.project = project;
 	}
 	 
 	public Date getStartDate() {
@@ -48,10 +56,10 @@ public class ProjectVO {
 		this.endDate = endDate;
 	}
 	 
-	public int getPriority() {
+	public String getPriority() {
 		return priority;
 	}
-	public void setPriority(int priority) {
+	public void setPriority(String priority) {
 		this.priority = priority;
 	}
 	public String getStatus() {
