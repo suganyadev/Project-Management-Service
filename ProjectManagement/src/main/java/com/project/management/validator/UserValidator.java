@@ -4,15 +4,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import com.project.management.vo.ProjectVO;
+import com.project.management.vo.UserVO;
 
 
 @Component
-public class ProjectValidator implements Validator{
+public class UserValidator implements Validator{
 
 	@Override
 	public boolean supports(Class<?> clazz) {
-		return ProjectVO.class.isAssignableFrom(clazz);
+		return UserVO.class.isAssignableFrom(clazz);
 	}
 
 	@Override

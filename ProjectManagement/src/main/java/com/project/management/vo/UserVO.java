@@ -1,16 +1,52 @@
 package com.project.management.vo;
 
 public class UserVO {
-	private int employeeId;
+	private int userId;
+	private String employeeId;
 	private String firstName;
 	private String lastName;
 	private String status;
 	private ProjectVO project;
 	private TaskVO task;
-	public int getEmployeeId() {
+	
+	
+	 
+	public UserVO(int userId, String employeeId, String firstName, String lastName, String status) {
+		super();
+		this.userId = userId;
+		this.employeeId = employeeId;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.status = status;
+	}
+	/**
+	 * 
+	 */
+	public UserVO() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	/**
+	 * @param employeeId
+	 * @param firstName
+	 * @param lastName
+	 */
+	public UserVO(String employeeId, String firstName, String lastName) {
+		super();
+		this.employeeId = employeeId;
+		this.firstName = firstName;
+		this.lastName = lastName;
+	}
+	public int getUserId() {
+		return userId;
+	}
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+	public String getEmployeeId() {
 		return employeeId;
 	}
-	public void setEmployeeId(int employeeId) {
+	public void setEmployeeId(String employeeId) {
 		this.employeeId = employeeId;
 	}
 	public String getFirstName() {

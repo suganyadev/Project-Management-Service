@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.project.management.model.ProjectManagementVO;
 import com.project.management.service.ProjectManagementService;
 import com.project.management.validator.ProjectValidator;
+import com.project.management.validator.UserValidator;
+import com.project.management.vo.ProjectVO;
 import com.project.management.vo.UserVO;
 
 
@@ -36,20 +38,32 @@ public class ProjectMgmtController {
 
 
 	@Autowired
-	ProjectValidator validator; 
+	ProjectValidator projectValidator; 
+	
+	@Autowired
+	UserValidator userValidator; 
 
 	@Autowired
 	ProjectManagementService service;
 
-	@InitBinder
-	public void InitBinder(WebDataBinder binder) {
-		binder.setValidator(validator);
+	@InitBinder("projectValidator")
+	public void InitProjectBinder(WebDataBinder binder) {
+		binder.setValidator(projectValidator);
 	}
+	
+	@InitBinder("userValidator")
+	public void InitUserBinder(WebDataBinder binder) {
+		binder.setValidator(userValidator);
+	}
+
 
 	@GetMapping("/")
 	public String info() {
 		return "Welcome to Project Management";
 	}
+	
+	
+	
 	@PostMapping(path = "/users", consumes = "application/json", produces = "application/json")
 	public boolean saveUser(@RequestBody UserVO userVO) {
 		try {
@@ -84,6 +98,7 @@ public class ProjectMgmtController {
 			if(errors.size()>0)
 				return new ResponseEntity<>(errors, HttpStatus.OK);
 
+			vo.setStatus("Active");
 			service.addUser(vo);
 			
 		}catch(Exception e) {
@@ -97,7 +112,10 @@ public class ProjectMgmtController {
 		return ResponseEntity.ok().body(service.getAllUsers());
 	}
 	
-	
+	@GetMapping("/getAllEmployees")
+	public ResponseEntity<List<UserVO>> getAllEmployees() {
+		return ResponseEntity.ok().body(service.getDistinctUser());
+	}
 	
 	@DeleteMapping("/users/{userId}")
 	public boolean deleteUser(@PathVariable(name="userId") int userId) {
@@ -109,6 +127,47 @@ public class ProjectMgmtController {
 			return false;
 		}
 		return true;
+	}
+	
+	
+	@GetMapping("/getAllProjects")
+	public ResponseEntity<List<ProjectVO>> getAllProjects() {
+		return ResponseEntity.ok().body(service.getAllProjects());
+	}
+	
+	@PostMapping("/createProject")
+	public ResponseEntity<?> saveOrUpdateProject(@RequestBody @Valid ProjectVO vo,BindingResult result){
+		try {
+			Map<String, Set<String>> errors = new HashMap<>();
+			/*for (FieldError fieldError : result.getFieldErrors()) {
+				String code = fieldError.getCode();
+				String field = fieldError.getField();
+				if (code.equals("NotBlank") || code.equals("NotNull")) {
+					errors.computeIfAbsent(field, key -> new HashSet<>()).add("required");
+				}
+				if (field.equals("task")) {
+					errors.computeIfAbsent(field, key -> new HashSet<>()).add("Task is Invalid");
+				}
+
+				if (field.equals("parentTask")) {
+					errors.computeIfAbsent(field, key -> new HashSet<>()).add("Invalid ParentTask");
+				}
+			} */ 
+			if(errors.size()>0)
+				return new ResponseEntity<>(errors, HttpStatus.OK);
+
+		//	vo.setStatus("Open");
+			
+			if(null != vo.getStatus() && vo.getStatus().equalsIgnoreCase("Completed")) {
+				service.suspendProject(vo);
+			}else {
+				service.saveOrUpdateProject(vo);
+			}
+			
+		}catch(Exception e) {
+			return ResponseEntity.ok().body("Exception in Adding task");
+		}
+		return ResponseEntity.ok().body("User Created Successfully");
 	}
 	
 }
