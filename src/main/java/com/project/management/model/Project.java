@@ -33,7 +33,7 @@ public class Project {
 
 	@Column(name="status")
 	private String status;
-
+	
 	public int getProjectId() {
 		return projectId;
 	}

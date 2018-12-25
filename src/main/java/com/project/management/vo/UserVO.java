@@ -8,7 +8,35 @@ public class UserVO {
 	private String status;
 	private ProjectVO project;
 	private TaskVO task;
+	
+	
 	 
+	public UserVO(int userId, String employeeId, String firstName, String lastName, String status) {
+		super();
+		this.userId = userId;
+		this.employeeId = employeeId;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.status = status;
+	}
+	/**
+	 * 
+	 */
+	public UserVO() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	/**
+	 * @param employeeId
+	 * @param firstName
+	 * @param lastName
+	 */
+	public UserVO(String employeeId, String firstName, String lastName) {
+		super();
+		this.employeeId = employeeId;
+		this.firstName = firstName;
+		this.lastName = lastName;
+	}
 	public int getUserId() {
 		return userId;
 	}

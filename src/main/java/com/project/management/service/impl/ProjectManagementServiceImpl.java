@@ -1,45 +1,49 @@
 package com.project.management.service.impl;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
+import com.project.management.model.ParentTask;
 import com.project.management.model.Project;
+import com.project.management.model.Task;
 import com.project.management.model.Users;
 import com.project.management.repository.ParentTaskRepository;
 import com.project.management.repository.ProjectRepository;
 import com.project.management.repository.TaskRepository;
 import com.project.management.repository.UsersRepository;
 import com.project.management.service.ProjectManagementService;
+import com.project.management.vo.ManagerVO;
+import com.project.management.vo.ParentTaskVO;
 import com.project.management.vo.ProjectVO;
+import com.project.management.vo.TaskVO;
 import com.project.management.vo.UserVO;
 
 @Service
-public class ProjectManagementServiceImpl implements ProjectManagementService{
+public class ProjectManagementServiceImpl implements ProjectManagementService {
 
 	@Autowired
 	private UsersRepository userRepository;
-	
+
 	@Autowired
 	private ProjectRepository projectRepository;
 
 	@Autowired
 	private TaskRepository taskRepository;
-	
+
 	@Autowired
 	private ParentTaskRepository parentTaskRepository;
-	
+
 	public void addUser(UserVO vo) {
 		Users user = new Users();
-		
+
 		user.setFirstName(vo.getFirstName());
 		user.setLastName(vo.getLastName());
 		user.setEmployeeId(vo.getEmployeeId());
@@ -47,130 +51,332 @@ public class ProjectManagementServiceImpl implements ProjectManagementService{
 		userRepository.save(user);
 	}
 
- 
 	public UserVO getUserById(int userId) {
 		Optional<Users> optUser = userRepository.findById(userId);
-		UserVO userVO=new UserVO();
+		UserVO userVO = new UserVO();
 		userVO.setFirstName(optUser.get().getFirstName());
 		userVO.setLastName(optUser.get().getLastName());
 		userVO.setEmployeeId(optUser.get().getEmployeeId());
 		userVO.setStatus(optUser.get().getStatus());
 		return userVO;
 	}
-	
+
 	@Override
-	public boolean deleteUser(int userId) throws Exception{
+	public boolean deleteUser(int userId) throws Exception {
 		try {
-		UserVO existingUser = getUserById(userId);
-		if(existingUser != null) {
-			Users user=new Users();
-			user.setEmployeeId(existingUser.getEmployeeId());
-			user.setFirstName(existingUser.getFirstName());
-			user.setLastName(existingUser.getLastName());
-			user.setProjectId(0);
-			user.setTaskId(0);
-			user.setStatus("InActive");
-			userRepository.save(user);
-		}else {
-			System.out.println("delete user: No user available in the user id : " + userId);
-			return false;
-		}
-		}catch(Exception e) {
+			UserVO existingUser = getUserById(userId);
+			if (existingUser != null) {
+				Users user = new Users();
+				user.setEmployeeId(existingUser.getEmployeeId());
+				user.setFirstName(existingUser.getFirstName());
+				user.setLastName(existingUser.getLastName());
+				user.setProjectId(0);
+				user.setTaskId(0);
+				user.setStatus("Deleted");
+				userRepository.save(user);
+			} else {
+				System.out.println("delete user: No user available in the user id : " + userId);
+				return false;
+			}
+		} catch (Exception e) {
 			throw new Exception("delete user: No user available in the user id :");
 		}
 		return true;
 	}
-	
+
 	@Override
 	public List<UserVO> getAllUsers() {
 		List<UserVO> userVOList = new ArrayList<UserVO>();
-		List<Users> users = userRepository.findAll();
-		for(Users user: users) {
-			UserVO userVO=new UserVO();
-			userVO.setFirstName(user.getFirstName());
-			userVO.setLastName(user.getLastName());
-			userVO.setEmployeeId(user.getEmployeeId());
-			userVO.setStatus(user.getStatus());
-			userVO.setUserId(user.getUserId());
-			userVOList.add(userVO);
-			
-		}
+		List<Users> users = userRepository.findUsers();
+
+		userVOList.addAll(users.stream().map(user -> new UserVO(user.getUserId(), user.getEmployeeId(),
+				user.getFirstName(), user.getLastName(), user.getStatus())).distinct().collect(Collectors.toList()));
+		/*
+		 * for (Users user : users) { UserVO userVO = new UserVO();
+		 * userVO.setFirstName(user.getFirstName());user.getEmployeeId()
+		 * userVO.setLastName(user.getLastName());
+		 * userVO.setEmployeeId(user.getEmployeeId());
+		 * userVO.setStatus(user.getStatus()); userVO.setUserId(user.getUserId());
+		 * userVOList.add(userVO);
+		 * 
+		 * } return userVOList;
+		 */
 		return userVOList;
-	
+
+	}
+
+	@Override
+	public List<UserVO> getDistinctUser() {
+		List<UserVO> userVOList = new ArrayList<UserVO>();
+		List<ManagerVO> managerVOs = userRepository.findAllManagers();
+
+		userVOList.addAll(managerVOs.stream().map(
+				managerVO -> new UserVO(managerVO.getEmployeeId(), managerVO.getFirstName(), managerVO.getLastName()))
+				.distinct().collect(Collectors.toList()));
+		return userVOList;
+
 	}
 
 	@Override
 	public void updateUser(UserVO userVO) {
-		Users user=new Users();
+		Users user = new Users();
 		user.setEmployeeId(userVO.getEmployeeId());
 		user.setFirstName(userVO.getFirstName());
 		user.setLastName(userVO.getLastName());
 		user.setStatus(userVO.getStatus());
 		userRepository.save(user);
-		
+
 	}
 
-	
 	@Override
 	public void updateProject(ProjectVO projectVO) {
 
-		Project project=new Project();
+		Project project = new Project();
 		project.setProjectId(projectVO.getProjectId());
 		project.setProject(projectVO.getProject());
-		//project.setStartDate(projectVO.getStartDate());
-		//project.setEndDate(projectVO.getEndDate());
+		// project.setStartDate(projectVO.getStartDate());
+		// project.setEndDate(projectVO.getEndDate());
 		project.setPriority(projectVO.getPriority());
-		//project.setManagerId(Integer.parseInt(projectVO.getEmployeeId()));
+		// project.setManagerId(Integer.parseInt(projectVO.getEmployeeId()));
 		projectRepository.save(project);
-		
-	
-		
+
 	}
 
 	@Override
 	public List<ProjectVO> getAllProjects() {
-		
+
 		List<ProjectVO> projectVOList = new ArrayList<ProjectVO>();
 		List<Project> projects = projectRepository.findAll();
-		for(Project project: projects) {
-			ProjectVO userVO = new ProjectVO();
-			project.setProject(project.getProject());
-			project.setProjectId(project.getProjectId());
-			project.setStartDate(project.getStartDate());
-			project.setEndDate(project.getEndDate());
-			project.setStatus(project.getStatus());
-			projectVOList.add(userVO);
-			
+		for (Project project : projects) {
+			ProjectVO prjVO = new ProjectVO();
+			prjVO.setProject(project.getProject());
+			prjVO.setProjectId(project.getProjectId());
+			prjVO.setStartDate(project.getStartDate());
+			prjVO.setEndDate(project.getEndDate());
+			prjVO.setStatus(project.getStatus());
+			prjVO.setPriority(project.getPriority());
+			projectVOList.add(prjVO);
+
 		}
 		return projectVOList;
 	}
 
 	@Override
-	public void createProject(ProjectVO vo) {
-		Project project = new Project();
+	public void saveOrUpdateProject(ProjectVO vo) {
+		Project project = null;
+
+		if (vo.getProjectId() > 0) {
+			project = projectRepository.findById(vo.getProjectId()).get();
+		} else {
+			project = new Project();
+		}
+		// setting proj name
 		project.setProject(vo.getProject());
-		project.setStartDate(vo.getStartDate());
-		project.setEndDate(vo.getEndDate());
+
+		if (vo.isHasSetDefaultDate()) {
+			project.setStartDate(vo.getStartDate());
+			project.setEndDate(vo.getEndDate());
+		} else {
+			project.setStartDate(new Date());
+			project.setEndDate(new Date(new Date().getTime() + (1000 * 60 * 60 * 24)));
+		}
+
 		project.setPriority(vo.getPriority());
 		project.setStatus(vo.getStatus());
 		project = projectRepository.save(project);
-		System.out.println(" addedProject.getProjectId() "+project.getProjectId());
-		
-		Users user = userRepository.findById(vo.getUserId()).get();
+		System.out.println(" addedProject.getProjectId() " + project.getProjectId());
+
+		ManagerVO managerVO = vo.getManagerVO();
 		Users newUser = new Users();
 		newUser.setProjectId(project.getProjectId());
+		/*
+		 * newUser.setEmployeeId(managerVO.getEmployeeId());
+		 * newUser.setFirstName(managerVO.getFirstName());
+		 * newUser.setLastName(managerVO.getLastName());
+		 */
+
 		newUser.setEmployeeId(vo.getEmployeeId());
-		newUser.setFirstName(user.getFirstName());
-		newUser.setLastName(user.getLastName());
-		newUser.setStatus("Open");
-	
-		Set<Project> projectSet = new HashSet<Project>();
-		projectSet.add(project);
-		//newUser.setProject(projectSet);
-		
+		newUser.setFirstName(vo.getFirstName());
+		newUser.setLastName(vo.getLastName());
+		newUser.setStatus("Active");
+
+		// newUser.setProject(projectSet);
+		// Need to detach existing user to project mapping
+		Users existingAllocatedUser = userRepository.findUserByProjectId(project.getProjectId());
+
+		if (null != existingAllocatedUser) {
+			userRepository.deleteById(existingAllocatedUser.getUserId());
+		}
 		userRepository.save(newUser);
+
 	}
-	
+
+	@Override
+	public void suspendProject(@Valid ProjectVO vo) {
+		Project project = projectRepository.findById(vo.getProjectId()).get();
+		project.setStatus("Completed");
+	}
+
+	public List<ParentTaskVO> getAllParentTasks() {
+		List<ParentTaskVO> parentTaskVOList = new ArrayList<ParentTaskVO>();
+		List<ParentTask> parentTasks = parentTaskRepository.findAll();
+		for (ParentTask parentTask : parentTasks) {
+			ParentTaskVO parentTaskVO = new ParentTaskVO();
+			parentTaskVO.setParentId(parentTask.getParentId());
+			parentTaskVO.setParentTask(parentTask.getParentTask());
+			// parentTaskVO.setProjectId(parentTask.getProjectId());
+			parentTaskVOList.add(parentTaskVO);
+
+		}
+		return parentTaskVOList;
+	}
+
+	public ParentTask getParentTasks(Integer parentId) {
+		Optional<ParentTask> optParent = parentTaskRepository.findById(parentId);
+		return optParent.get();
+	}
+
+	public List<TaskVO> getAllTasks() {
+
+		List<TaskVO> taskVOList = new ArrayList<TaskVO>();
+		List<Task> tasks = taskRepository.findAll();
+		for (Task task : tasks) {
+			TaskVO taskVO = new TaskVO();
+			taskVO.setTaskId(task.getTaskId());
+			taskVO.setTaskName(task.getTask());
+			if (null != task.getParentTask()) {
+				taskVO.setParentTaskId(task.getParentTask().getParentId());
+				taskVO.setParentTaskName(task.getParentTask().getParentTask());
+			}
+			taskVO.setProjectId(task.getProject().getProjectId());
+			taskVO.setPriority(task.getPriority());
+			taskVO.setStartDate(task.getStartDate());
+			taskVO.setEndDate(task.getEndDate());
+			taskVO.setStatus(task.getStatus());
+			// taskVO.setEmployeeId(task.getUserDetails().getEmployeeId());
+			taskVOList.add(taskVO);
+
+		}
+		return taskVOList;
+	}
+
+	public List<TaskVO> getTasksByProject(int projectId) {
+		List<Task> tasks = taskRepository.getTasksByProjectId(projectId);
+		List<Users> users = userRepository
+				.getUsersByTask(tasks.stream().map(task -> task.getTaskId()).collect(Collectors.toList()));
+		List<TaskVO> taskVOList = new ArrayList<TaskVO>();
+		for (Task task : tasks) {
+			TaskVO taskVO = new TaskVO();
+			taskVO.setTaskId(task.getTaskId());
+			taskVO.setTaskName(task.getTask());
+			if (null != task.getParentTask()) {
+				taskVO.setParentTaskId(task.getParentTask().getParentId());
+				taskVO.setParentTaskName(task.getParentTask().getParentTask());
+			}
+			taskVO.setProjectId(task.getProject().getProjectId());
+			taskVO.setPriority(task.getPriority());
+			taskVO.setStartDate(task.getStartDate());
+			taskVO.setEndDate(task.getEndDate());
+			taskVO.setStatus(task.getStatus());
+			taskVO.setProjectName(task.getProject().getProject());
+			Users assignedUser = users.stream().filter(user -> (user.getTaskId() == task.getTaskId())).findFirst()
+					.get();
+			taskVO.setEmployeeId(assignedUser.getEmployeeId());
+			taskVO.setFirstName(assignedUser.getFirstName());
+			taskVO.setLastName(assignedUser.getLastName());
+			taskVOList.add(taskVO);
+		}
+
+		return taskVOList;
+	}
+
+	public void saveTask(TaskVO taskVO) {
+
+		Task task = new Task();
+		task.setStatus("A");
+		task.setTask(taskVO.getTaskName());
+		task.setProject(projectRepository.findById(taskVO.getProjectId()).get());
+		task = taskRepository.save(task);
+
+		if (taskVO.isParentTaskInd()) {
+			ParentTask parent = new ParentTask();
+			parent.setParentId(task.getTaskId());
+			parent.setParentTask(taskVO.getTaskName());
+			parentTaskRepository.save(parent);
+
+		} else {
+			task.setEndDate(taskVO.getEndDate());
+			task.setPriority(taskVO.getPriority());
+			task.setStartDate(taskVO.getStartDate());
+		}
+
+		if (taskVO.getParentTaskId() > 0) {
+			ParentTask parentTask = parentTaskRepository.findById(taskVO.getParentTaskId()).get();
+			task.setParentTask(parentTask);
+		}
+		Users usr = new Users();
+
+		Users projectUser = userRepository.findById(taskVO.getUserId()).get();
+
+		usr.setProjectId(taskVO.getProjectId());
+		usr.setTaskId(task.getTaskId());
+		usr.setEmployeeId(projectUser.getEmployeeId());
+		usr.setFirstName(projectUser.getFirstName());
+		usr.setLastName(projectUser.getLastName());
+		usr.setStatus(projectUser.getStatus());
+		userRepository.save(usr);
+
+	}
+
+	public TaskVO getTask(String taskId) {
+		Task optTask = taskRepository.findById(Integer.parseInt(taskId)).get();
+
+		TaskVO taskVO = new TaskVO();
+		taskVO.setTaskId(optTask.getTaskId());
+		taskVO.setTaskName(optTask.getTask());
+		taskVO.setParentTaskId(optTask.getParentTask().getParentId());
+		taskVO.setParentTaskName(optTask.getParentTask().getParentTask());
+		taskVO.setProjectId(optTask.getProject().getProjectId());
+		taskVO.setPriority(optTask.getPriority());
+		taskVO.setStartDate(optTask.getStartDate());
+		taskVO.setEndDate(optTask.getEndDate());
+		taskVO.setStatus(optTask.getStatus());
+		// taskVO.setEmployeeId(optTask.getUserDetails().getEmployeeId());
+		return taskVO;
+	}
+
+	public void updateTask(TaskVO taskVO) {
+		Task task = taskRepository.findById(taskVO.getTaskId()).get();
+		task.setTaskId(taskVO.getTaskId());
+		task.setEndDate(taskVO.getEndDate());
+		task.setPriority(taskVO.getPriority());
+		task.setStartDate(taskVO.getStartDate());
+		task.setStatus(taskVO.getStatus());
+		task.setTask(taskVO.getTaskName());
+
+		task.setProject(projectRepository.findById(taskVO.getProjectId()).get());
+
+		Users user = userRepository.findUserByEmployeeId(taskVO.getEmployeeId());
+
+		Users existingAssignee = userRepository.getUserByTaskId(taskVO.getTaskId());
+		if (existingAssignee != null) {
+			userRepository.deleteById(existingAssignee.getUserId());
+		}
+		
+		Users newAssignee=new Users();
+		newAssignee.setEmployeeId(taskVO.getEmployeeId());
+		newAssignee.setFirstName(taskVO.getFirstName());
+		newAssignee.setLastName(taskVO.getLastName());
+		newAssignee.setStatus(user.getStatus());
+		newAssignee.setProjectId(taskVO.getProjectId());
+		newAssignee.setTaskId(taskVO.getTaskId());
+		userRepository.save(newAssignee);
+
+		ParentTask p = getParentTasks(taskVO.getParentTaskId());
+		// p.setParentTaskId(taskVO.getParentTaskId());
+		// p.setParentTaskName("tsk screens");
+		task.setParentTask(p);
+
+		taskRepository.save(task);
+	}
 }
-
-

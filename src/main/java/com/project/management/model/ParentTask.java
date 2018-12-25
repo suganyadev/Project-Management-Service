@@ -5,8 +5,6 @@ package com.project.management.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**
@@ -16,8 +14,7 @@ import javax.persistence.Id;
 @Entity(name = "parent_task")
 public class ParentTask {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name="parent_id")
+	@Column(name="parent_id", nullable=false)
 	private int parentId;
 	
 	@Column(name="parentTask")

@@ -1,20 +1,40 @@
 package com.project.management.vo;
 
 public class TaskVO {
-	private Long taskId;
+	private int taskId;
 	private String taskName;
-	private Long parentTaskId;
+	private int parentTaskId;
 	private String parentTaskName;
 	private String priority;
 	private String startDate;
 	private String endDate;
 	private String status;
-	private Long projectId;
+	private int projectId;
 	private String employeeId;
-	public Long getTaskId() {
+	private String firstName;
+	private String lastName;
+	private String projectName;
+	
+	private boolean parentTaskInd;
+	private int userId;
+	
+	public int getUserId() {
+		return userId;
+	}
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+	
+	public boolean isParentTaskInd() {
+		return parentTaskInd;
+	}
+	public void setParentTaskInd(boolean parentTaskInd) {
+		this.parentTaskInd = parentTaskInd;
+	}
+	public int getTaskId() {
 		return taskId;
 	}
-	public void setTaskId(Long taskId) {
+	public void setTaskId(int taskId) {
 		this.taskId = taskId;
 	}
 	public String getTaskName() {
@@ -23,10 +43,10 @@ public class TaskVO {
 	public void setTaskName(String taskName) {
 		this.taskName = taskName;
 	}
-	public Long getParentTaskId() {
+	public int getParentTaskId() {
 		return parentTaskId;
 	}
-	public void setParentTaskId(Long parentTaskId) {
+	public void setParentTaskId(int parentTaskId) {
 		this.parentTaskId = parentTaskId;
 	}
 	public String getParentTaskName() {
@@ -59,10 +79,10 @@ public class TaskVO {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	public Long getProjectId() {
+	public int getProjectId() {
 		return projectId;
 	}
-	public void setProjectId(Long projectId) {
+	public void setProjectId(int projectId) {
 		this.projectId = projectId;
 	}
 	public String getEmployeeId() {
@@ -71,6 +91,25 @@ public class TaskVO {
 	public void setEmployeeId(String employeeId) {
 		this.employeeId = employeeId;
 	}
+	public String getFirstName() {
+		return firstName;
+	}
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	public String getLastName() {
+		return lastName;
+	}
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+	public String getProjectName() {
+		return projectName;
+	}
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
+	}
+	
 	
 	
 }

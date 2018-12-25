@@ -4,15 +4,16 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.project.management.vo.ParentTaskVO;
 import com.project.management.vo.ProjectVO;
+import com.project.management.vo.TaskVO;
 import com.project.management.vo.UserVO;
 
 public interface ProjectManagementService {
-	
-	public void addUser(UserVO user);
-	
 
-	public boolean deleteUser(int userId) throws Exception;
+	void addUser(UserVO user);
+
+	boolean deleteUser(int userId) throws Exception;
 
 	List<UserVO> getAllUsers();
 
@@ -20,10 +21,24 @@ public interface ProjectManagementService {
 
 	void updateProject(ProjectVO projectVO);
 
-	public List<ProjectVO> getAllProjects();
+	List<ProjectVO> getAllProjects();
 
-	public void createProject(ProjectVO projectMgmt);
+	void saveOrUpdateProject(ProjectVO projectMgmt);
 
+	List<UserVO> getDistinctUser();
 
+	void suspendProject(@Valid ProjectVO vo);
+
+	List<ParentTaskVO> getAllParentTasks();
+
+	void saveTask(TaskVO task);
+
+	List<TaskVO> getAllTasks();
+
+	TaskVO getTask(String taskId);
+
+	void updateTask(TaskVO task);
+
+	List<TaskVO> getTasksByProject(int projectId);
 
 }
