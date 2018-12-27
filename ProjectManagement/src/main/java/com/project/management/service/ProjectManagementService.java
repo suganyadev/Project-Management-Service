@@ -4,7 +4,9 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.project.management.vo.ParentTaskVO;
 import com.project.management.vo.ProjectVO;
+import com.project.management.vo.TaskVO;
 import com.project.management.vo.UserVO;
 
 public interface ProjectManagementService {
@@ -26,5 +28,17 @@ public interface ProjectManagementService {
 	List<UserVO> getDistinctUser();
 
 	void suspendProject(@Valid ProjectVO vo);
+
+	List<ParentTaskVO> getAllParentTasks();
+
+	void saveTask(TaskVO task);
+
+	List<TaskVO> getAllTasks();
+
+	TaskVO getTask(String taskId);
+
+	void updateTask(TaskVO task);
+
+	List<TaskVO> getTasksByProject(int projectId);
 
 }

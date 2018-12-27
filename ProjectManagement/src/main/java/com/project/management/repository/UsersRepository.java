@@ -16,7 +16,7 @@ import com.project.management.vo.ManagerVO;
  */
 @Repository
 public interface UsersRepository extends JpaRepository<Users, Integer> {
-	@Query("select u.userId, u.firstName,u.lastName,u.employeeId,u.status from Users u where u.employeeId=:empId")
+	@Query("select u from Users u where u.employeeId=:empId and u.projectId=0 and u.taskId=0")
 	Users findUserByEmployeeId(@Param("empId") String empId);
 
 	@Query("select  new com.project.management.vo.ManagerVO(u.employeeId, u.firstName,u.lastName) from Users u")
@@ -24,11 +24,25 @@ public interface UsersRepository extends JpaRepository<Users, Integer> {
 
 	@Query("select users from Users users where users.projectId=0 and users.taskId=0")
 	List<Users> findUsers();
-	
-	@Query("select users from Users users where users.projectId=:projectId")
+
+	@Query("select users from Users users where users.projectId=:projectId and users.taskId =0")
 	Users findUserByProjectId(@Param("projectId") int projectId);
-	
+
 	@Query("select users from Users users where users.projectId=:projectId and users.userId=:userId")
-	void deleteUserByProjectAndUserId(@Param("projectId") int projectId,@Param("userId") int userId);
+	void deleteUserByProjectAndUserId(@Param("projectId") int projectId, @Param("userId") int userId);
+
+	@Query("select users from Users users where users.taskId in (:taskIds)")
+	List<Users> getUsersByTask(@Param("taskIds") List<Integer> taskIds);
+
+	@Query("select users from Users users where users.taskId = :taskIds")
+	Users getUserByTaskId(@Param("taskIds") Integer taskIds);
+
+	@Query("select users from Users users where users.userId = :userId")
+	Users findUsersById(@Param("userId") int userId);
+
+	@Query("select users from Users users where users.firstName = :firstName and "
+			+ "users.lastName = :lastName and users.employeeId = :employeeId")
+	List<Users> findUsersByNameandEmpId(@Param("firstName") String firstName, @Param("lastName") String lastName,
+			@Param("employeeId") String employeeId);
 
 }

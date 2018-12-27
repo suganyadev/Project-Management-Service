@@ -1,8 +1,6 @@
 package com.project.management.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,11 +21,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.project.management.model.ProjectManagementVO;
 import com.project.management.service.ProjectManagementService;
 import com.project.management.validator.ProjectValidator;
 import com.project.management.validator.UserValidator;
+import com.project.management.vo.ParentTaskVO;
 import com.project.management.vo.ProjectVO;
+import com.project.management.vo.TaskVO;
 import com.project.management.vo.UserVO;
 
 
@@ -62,6 +60,76 @@ public class ProjectMgmtController {
 		return "Welcome to Project Management";
 	}
 	
+	@GetMapping("/getParentTask")
+	public List<ParentTaskVO> getParentTasks() {
+		List<ParentTaskVO> tasks =service.getAllParentTasks();
+		return tasks;
+	}
+	
+	@GetMapping("/tasks")
+	public List<TaskVO> getTasks() {
+		List<TaskVO> tasks =service.getAllTasks();
+		return tasks;
+	}
+	
+	@GetMapping("/tasksByProject/{projectId}")
+	public List<TaskVO> getTasksByProject(@PathVariable(name="projectId") int projectId) {
+		List<TaskVO> tasks =service.getTasksByProject(projectId);
+		return tasks;
+	}
+	
+	@GetMapping("/tasks/{taskId}")
+	public TaskVO getTasksById(@PathVariable(name="taskId") String taskId) {
+		TaskVO task = service.getTask(taskId); 
+		return task;
+	}
+	
+	@PostMapping(path = "/task", consumes = "application/json", produces = "application/json")
+	public boolean saveTask(@RequestBody TaskVO task) {
+		try {
+			
+			service.saveTask(task);
+		}catch(Exception e)
+		{
+			return false;
+		}
+		return true;
+	}	
+	
+	@PostMapping("/editTask")
+	public boolean updateTask(@RequestBody TaskVO task) {
+		try {
+			TaskVO taskExists = service.getTask(String.valueOf(task.getTaskId()));
+			if(taskExists != null) {
+				service.updateTask(task);
+			}else {
+				System.out.println("update Task: No task available in the task id : " + task.getTaskId());
+				return false;
+			}
+		}catch(Exception e)
+		{
+			System.out.println("Update Task Failed : " + e.getMessage());
+			return false;
+		}
+		return true;
+	}
+	
+	@DeleteMapping("/tasks/{taskId}")
+	public boolean deleteTask(@PathVariable(name="taskId") String taskId) {
+		try {
+			TaskVO taskRetrived = service.getTask(taskId);
+			if(taskRetrived != null) {
+				taskRetrived.setStatus("I");
+				service.updateTask(taskRetrived);
+			}else {
+				return false;
+			}
+		}catch(Exception e)
+		{
+			return false;
+		}
+		return true;
+	}
 	
 	
 	@PostMapping(path = "/users", consumes = "application/json", produces = "application/json")
@@ -71,30 +139,16 @@ public class ProjectMgmtController {
 			//projectManagerService.saveUser(userVO);
 		}catch(Exception e)
 		{
-			System.out.println("Save Project Failed : " + e.getMessage());
 			return false;
 		}
 		return true;
 	}
 
 	@PostMapping("/addUser")
-	public ResponseEntity<?> addTask(@RequestBody @Valid UserVO vo,BindingResult result){
+	public ResponseEntity<?> addUser(@RequestBody @Valid UserVO vo,BindingResult result){
 		try {
 			Map<String, Set<String>> errors = new HashMap<>();
-			/*for (FieldError fieldError : result.getFieldErrors()) {
-				String code = fieldError.getCode();
-				String field = fieldError.getField();
-				if (code.equals("NotBlank") || code.equals("NotNull")) {
-					errors.computeIfAbsent(field, key -> new HashSet<>()).add("required");
-				}
-				if (field.equals("task")) {
-					errors.computeIfAbsent(field, key -> new HashSet<>()).add("Task is Invalid");
-				}
-
-				if (field.equals("parentTask")) {
-					errors.computeIfAbsent(field, key -> new HashSet<>()).add("Invalid ParentTask");
-				}
-			} */ 
+			 
 			if(errors.size()>0)
 				return new ResponseEntity<>(errors, HttpStatus.OK);
 
@@ -118,15 +172,14 @@ public class ProjectMgmtController {
 	}
 	
 	@DeleteMapping("/users/{userId}")
-	public boolean deleteUser(@PathVariable(name="userId") int userId) {
+	public String deleteUser(@PathVariable(name="userId") int userId) {
 		try {
 			service.deleteUser(userId);
 		}catch(Exception e)
 		{
-			System.out.println("Delete user Failed : " + e.getMessage());
-			return false;
+			return "User Deletion failed";
 		}
-		return true;
+		return "User Deleted Successfully";
 	}
 	
 	
@@ -139,25 +192,10 @@ public class ProjectMgmtController {
 	public ResponseEntity<?> saveOrUpdateProject(@RequestBody @Valid ProjectVO vo,BindingResult result){
 		try {
 			Map<String, Set<String>> errors = new HashMap<>();
-			/*for (FieldError fieldError : result.getFieldErrors()) {
-				String code = fieldError.getCode();
-				String field = fieldError.getField();
-				if (code.equals("NotBlank") || code.equals("NotNull")) {
-					errors.computeIfAbsent(field, key -> new HashSet<>()).add("required");
-				}
-				if (field.equals("task")) {
-					errors.computeIfAbsent(field, key -> new HashSet<>()).add("Task is Invalid");
-				}
-
-				if (field.equals("parentTask")) {
-					errors.computeIfAbsent(field, key -> new HashSet<>()).add("Invalid ParentTask");
-				}
-			} */ 
+			 
 			if(errors.size()>0)
 				return new ResponseEntity<>(errors, HttpStatus.OK);
 
-		//	vo.setStatus("Open");
-			
 			if(null != vo.getStatus() && vo.getStatus().equalsIgnoreCase("Completed")) {
 				service.suspendProject(vo);
 			}else {

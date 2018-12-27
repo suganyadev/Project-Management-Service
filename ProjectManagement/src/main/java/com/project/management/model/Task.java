@@ -1,7 +1,5 @@
 package com.project.management.model;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,12 +7,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * @author 444158
  *
  */
-@Entity(name = "task")
+@Table(name = "task")
+@Entity
 public class Task {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -33,16 +33,24 @@ public class Task {
 	private String task;
 	
 	@Column(name="start_date")
-	private Date startDate;
+	private String startDate;
 	
 	@Column(name="end_date")
-	private Date endDate;
+	private String endDate;
 	
 	@Column(name="priority")
-	private int priority;
+	private String priority; 
 	
 	@Column(name="status")
 	private String status;
+
+	
+	
+	
+	public Task() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
 	public int getTaskId() {
 		return taskId;
@@ -76,27 +84,27 @@ public class Task {
 		this.task = task;
 	}
 
-	public Date getStartDate() {
+	public String getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(Date startDate) {
+	public void setStartDate(String startDate) {
 		this.startDate = startDate;
 	}
 
-	public Date getEndDate() {
+	public String getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(Date endDate) {
+	public void setEndDate(String endDate) {
 		this.endDate = endDate;
 	}
 
-	public int getPriority() {
+	public String getPriority() {
 		return priority;
 	}
 
-	public void setPriority(int priority) {
+	public void setPriority(String priority) {
 		this.priority = priority;
 	}
 
