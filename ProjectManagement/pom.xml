@@ -71,6 +71,11 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency> -->
+		 <dependency>
+	    <groupId>com.spotify</groupId>
+	    <artifactId>docker-maven-plugin</artifactId>
+	    <version>1.2.0</version>
+	</dependency>
 	</dependencies>
 
 	<build>
@@ -79,6 +84,33 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+		      <groupId>com.spotify</groupId>
+		      <artifactId>docker-maven-plugin</artifactId>
+		      <version>1.2.0</version>
+		      <executions>
+			    <execution>
+			      <id>default</id>
+			      <goals>
+			        <goal>build</goal>
+			      </goals>
+			    </execution>
+			  </executions>
+		      <configuration>
+		    	  <dockerHost>http://172.18.2.50:2375</dockerHost>
+		      	<repository>suganya/projectmanagement</repository>
+		        <imageName>suganya-projectmanagement-image</imageName>
+		        <tag>${project.version}</tag>
+		        <dockerDirectory>docker</dockerDirectory>
+		        <resources>
+		           <resource>
+		             <targetPath></targetPath>
+		             <directory>${project.build.directory}</directory>
+		             <include>ProjectManagement-0.0.1-SNAPSHOT.jar</include>
+		           </resource>
+		        </resources>
+		      </configuration>
+		    </plugin>
 		</plugins>
 	</build>
 
